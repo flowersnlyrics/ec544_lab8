@@ -129,27 +129,27 @@ void vApplicationDaemonTaskStartupHook(void)
         BOARD_InitNetwork();
 
         /* Initialize mflash file system for device configuration */
-        if (dev_cfg_init() != 0)
-        {
-            PRINTF("Failed to initialze device for configuration\r\n");
-            while (1)
-                ;
-        }
+//        if (dev_cfg_init() != 0)
+//        {
+//            PRINTF("Failed to initialze device for configuration\r\n");
+//            while (1)
+//                ;
+//        }
+//
+//        /* Initialize device for configuration by mobile app - start SSL server and mDNS responder */
+//        if (dev_cfg_init_config_server(&fsl_netif0, kDEV_CFG_ENET) != 0)
+//        {
+//            PRINTF("Failed to initialze device for configuration\r\n");
+//            while (1)
+//                ;
+//        }
 
-        /* Initialize device for configuration by mobile app - start SSL server and mDNS responder */
-        if (dev_cfg_init_config_server(&fsl_netif0, kDEV_CFG_ENET) != 0)
-        {
-            PRINTF("Failed to initialze device for configuration\r\n");
-            while (1)
-                ;
-        }
-
-        /* Check if the device is configured */
-        if (dev_cfg_check_aws_credentials() != 0)
-        {
-            configPRINTF(("Device has not set aws credentials, use mobile app to configure the device\r\n"));
-            return;
-        }
+//        /* Check if the device is configured */
+//        if (dev_cfg_check_aws_credentials() != 0)
+//        {
+//            configPRINTF(("Device has not set aws credentials, use mobile app to configure the device\r\n"));
+//            return;
+//        }
 
         /* Device is configured, start AWS demo */
         vStartShadowDemoTasks();
@@ -159,14 +159,27 @@ void vApplicationDaemonTaskStartupHook(void)
 int main(void)
 {
     SYSMPU_Type *base = SYSMPU;
-    BOARD_InitPins();
+
+    BOARD_InitPins(); // <-- EC544 ADD STUFF IN HERE
     BOARD_BootClockRUN();
+
     BOARD_InitDebugConsole();
+
     /* Disable SYSMPU. */
     base->CESR &= ~SYSMPU_CESR_VLD_MASK;
     CRYPTO_InitHardware();
 
     xLoggingTaskInitialize(LOGGING_TASK_STACK_SIZE, LOGGING_TASK_PRIORITY, LOGGING_QUEUE_LENGTH);
+
+    /* EC544: add me to work with LEDs */
+    printf("To see MQTT Messages, subscribe to freertos/demos/echo on AWS\n");
+    LED_RED_ON();
+    printf("RED LED\n");
+    LED_RED_OFF();
+    LED_GREEN_ON();
+    printf("GREEN LED\n");
+    LED_GREEN_OFF();
+    /* EC544: END OF ADD ME in */
 
     vTaskStartScheduler();
     for (;;)
