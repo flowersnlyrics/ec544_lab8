@@ -53,6 +53,10 @@
 
 #include "fsl_device_registers.h"
 #include "clock_config.h"
+
+/* EC544 Includes */
+#include "aws_hello_world.h"
+
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
@@ -180,6 +184,9 @@ int main(void)
     printf("GREEN LED\n");
     LED_GREEN_OFF();
     /* EC544: END OF ADD ME in */
+
+    vStartMQTTEchoDemo();
+
 
     vTaskStartScheduler();
     for (;;)

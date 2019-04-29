@@ -148,6 +148,14 @@ static BaseType_t prvDeltaCallback( void * pvUserData,
                                     uint32_t ulDocumentLength,
                                     MQTTBufferHandle_t xBuffer );
 
+/* Called when there's a difference between "reported" and "desired" in Shadow document. */
+static BaseType_t prvHeyThere( void * pvUserData,
+                                    const char * const pcThingName,
+                                    const char * const pcDeltaDocument,
+                                    uint32_t ulDocumentLength,
+                                    MQTTBufferHandle_t xBuffer );
+
+
 /* JSON functions. */
 static uint32_t prvGenerateDesiredJSON( ShadowQueueData_t * const pxShadowQueueData,
                                         const char * const pcTaskName,
@@ -218,6 +226,15 @@ static BaseType_t prvIsStringEqual( const char * const pcJson,    /*lint !e971 c
     }
 
     return xStatus;
+}
+
+static BaseType_t prvHeyThere( void * pvUserData,
+                                    const char * const pcThingName,
+                                    const char * const pcDeltaDocument,
+                                    uint32_t ulDocumentLength,
+                                    MQTTBufferHandle_t xBuffer )
+{
+    printf("Hey there!\n");
 }
 
 /*-----------------------------------------------------------*/
@@ -463,7 +480,7 @@ static void prvShadowInitTask( void * pvParameters )
              * the Shadow so that any previous Shadow doesn't unintentionally trigger the
              * delta callback.*/
             xCallbackParams.pcThingName = shadowDemoTHING_NAME;
-            xCallbackParams.xShadowUpdatedCallback = NULL;
+            xCallbackParams.xShadowUpdatedCallback = prvHeyThere;
             xCallbackParams.xShadowDeletedCallback = NULL;
             xCallbackParams.xShadowDeltaCallback = prvDeltaCallback;
 
@@ -512,6 +529,8 @@ static void prvShadowInitTask( void * pvParameters )
  * request periodic change in state (color) of light bulb.  */
 void vStartShadowDemoTasks( void )
 {
+	return;  // EC544: We are simply going to return from this call as we don't want to run the shadow demo task
+
     ( void ) xTaskCreate( prvShadowInitTask,
                           "MainDemoTask",
                           shadowDemoUPDATE_TASK_STACK_SIZE,
